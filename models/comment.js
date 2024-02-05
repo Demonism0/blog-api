@@ -9,7 +9,7 @@ const CommentSchema = mongoose.Schema({
   date: { type: Date, default: Date.now, required: true },
 });
 
-CommentSchema.virtual('url').get(function() {
+CommentSchema.virtual('url').get(function () {
   return `/api/posts/${this.parent}/comments/${this._id}`;
 });
 

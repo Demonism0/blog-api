@@ -65,6 +65,7 @@ exports.commentCreatePOST = [
     const comment = new Comment({
       body: req.body.body,
       author: req.body.name,
+      parent: req.params.postId,
     });
     await comment.save();
 

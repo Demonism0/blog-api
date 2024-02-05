@@ -11,7 +11,7 @@ mongoose.set('strictQuery', false);
 
 const mongoDB = process.env.MONGODB_URI;
 
-async function main () {
+async function main() {
   await mongoose.connect(mongoDB);
 }
 main().catch((err) => console.log(err));
