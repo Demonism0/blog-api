@@ -7,7 +7,7 @@ const PostSchema = mongoose.Schema({
   body: { type: String, required: true, minLength: 1, maxLength: 280 },
   date: { type: Date, default: Date.now, required: true },
   public: { type: Boolean, default: true, required: true },
-})
+});
 
 PostSchema.virtual('url').get(function () {
   return `/api/posts/${this._id}`;

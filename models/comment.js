@@ -7,7 +7,7 @@ const CommentSchema = mongoose.Schema({
   author: { type: String, required: true, minLength: 1, maxLength: 32 },
   parent: { type: mongoose.Schema.ObjectId, ref: 'Post', required: true },
   date: { type: Date, default: Date.now, required: true },
-})
+});
 
 CommentSchema.virtual('url').get(function() {
   return `/api/posts/${this.parent}/comments/${this._id}`;

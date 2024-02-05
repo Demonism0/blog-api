@@ -2,6 +2,7 @@ const express = require('express');
 
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
@@ -16,6 +17,8 @@ async function main () {
 main().catch((err) => console.log(err));
 
 const User = require('./models/user');
+
+app.use(cors());
 
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
