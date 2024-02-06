@@ -19,9 +19,8 @@ exports.postsGET = asyncHandler(async (req, res) => {
         postList: publicPosts,
       });
     }
+    res.json({ postList });
   });
-
-  res.json({ postList });
 });
 
 exports.postIdGET = asyncHandler(async (req, res) => {
