@@ -108,6 +108,20 @@ exports.loginPOST = [
   }),
 ];
 
+exports.adminPostsGET = asyncHandler(async (req, res) => {
+  jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
+    if (err) {
+      return res.status(403).json({
+        message: 'Forbidden',
+      });
+    }
+  });
+
+  const postList = await Post.find().sort({ date: -1 }).exec();
+
+  res.json({ postList });
+});
+
 exports.postCreatePOST = [
   body('title')
     .trim()

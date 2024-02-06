@@ -18,6 +18,9 @@ router.post('/posts/:postId', apiController.commentCreatePOST);
 // POST request on /login for creating a bearer token
 router.post('/login', apiController.loginPOST);
 
+// GET request on /posts/admin for viewing all public/private posts
+router.get('/posts/admin', apiController.adminPostsGET);
+
 // POST request on /posts for making a new post
 router.post('/posts', apiController.postCreatePOST);
 
