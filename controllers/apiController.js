@@ -79,26 +79,6 @@ exports.commentCreatePOST = [
 
 // Admin Only
 
-function verifyToken(req, res, next) {
-  // Get auth header value
-  const bearerHeader = req.headers.authorization;
-  // Check if bearer is undefined
-  if (typeof bearerHeader !== 'undefined') {
-    // Split at the space
-    const bearer = bearerHeader.split(' ');
-    // Get token from array
-    const bearerToken = bearer[1];
-    // Set the token
-    req.token = bearerToken;
-    next();
-  } else {
-    // Forbidden
-    res.status(403).json({
-      message: 'Forbidden',
-    });
-  }
-}
-
 exports.loginPOST = [
   body('username')
     .trim()
@@ -150,7 +130,6 @@ exports.postCreatePOST = [
 
   asyncHandler(async (req, res) => {
     // Code to verify that user is admin
-    await verifyToken();
     jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
       if (err) {
         return res.status(403).json({
@@ -217,7 +196,6 @@ exports.postEditPUT = [
     }
 
     // Code to verify that user is admin
-    await verifyToken();
     jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
       if (err) {
         return res.status(403).json({
@@ -264,7 +242,6 @@ exports.postDELETE = asyncHandler(async (req, res) => {
   }
 
   // Code to verify that user is admin
-  await verifyToken();
   jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
     if (err) {
       return res.status(403).json({
@@ -290,7 +267,6 @@ exports.commentDELETE = asyncHandler(async (req, res) => {
     });
   }
 
-  await verifyToken();
   jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
     if (err) {
       return res.status(403).json({
