@@ -219,9 +219,9 @@ exports.postEditPUT = [
     const updatedPost = new Post({
       title: req.body.title,
       body: req.body.body,
-      date: post.date,
+      date: { ...post.date },
       public: req.body.public,
-      _id: req.params.id,
+      _id: req.params.postId,
     });
 
     await Post.findByIdAndUpdate(req.params.postId, updatedPost, {});
