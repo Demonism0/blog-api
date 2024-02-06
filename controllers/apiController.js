@@ -8,19 +8,18 @@ const Comment = require('../models/comment');
 
 exports.postsGET = asyncHandler(async (req, res) => {
   const postList = await Post.find().sort({ date: -1 }).exec();
-
-  jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-    if (err) {
-      const publicPosts = postList.filter(
-        (post) => post.public === true,
-      );
-      return res.json({
-        message: 'Admin not verified, displaying public posts',
-        postList: publicPosts,
-      });
-    }
-    res.json({ postList });
-  });
+  try {
+    jwt.verify(req.token, process.env.SECRET_KEY);
+  } catch {
+    const publicPosts = postList.filter(
+      (post) => post.public === true,
+    );
+    return res.json({
+      message: 'Admin not verified, displaying public posts',
+      postList: publicPosts,
+    });
+  }
+  res.json({ postList });
 });
 
 exports.postIdGET = asyncHandler(async (req, res) => {
@@ -111,11 +110,9 @@ exports.loginPOST = [
       });
     }
 
-    jwt.sign({ user }, process.env.SECRET_KEY, (err, token) => {
-      res.json({
-        token,
-      });
-    });
+    const token = jwt.sign(user, process.env.SECRET_KEY);
+
+    res.json({ token });
   }),
 ];
 
