@@ -110,7 +110,7 @@ exports.loginPOST = [
       });
     }
 
-    const token = jwt.sign(user, process.env.SECRET_KEY);
+    const token = jwt.sign({ user }, process.env.SECRET_KEY);
 
     res.json({ token });
   }),
