@@ -7,7 +7,19 @@ const Post = require('../models/post');
 const Comment = require('../models/comment');
 
 exports.postsGET = asyncHandler(async (req, res) => {
-  const postList = await Post.find({ public: true }).sort({ date: -1 }).exec();
+  const postList = await Post.find().sort({ date: -1 }).exec();
+
+  jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
+    if (err) {
+      const publicPosts = postList.filter(
+        (post) => post.public === true,
+      );
+      return res.json({
+        message: 'Admin not verified, displaying public posts',
+        postList: publicPosts,
+      });
+    }
+  });
 
   res.json({ postList });
 });
@@ -107,20 +119,6 @@ exports.loginPOST = [
     });
   }),
 ];
-
-exports.adminPostsGET = asyncHandler(async (req, res) => {
-  jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-    if (err) {
-      return res.status(403).json({
-        message: 'Forbidden',
-      });
-    }
-  });
-
-  const postList = await Post.find().sort({ date: -1 }).exec();
-
-  res.json({ postList });
-});
 
 exports.postCreatePOST = [
   body('title')
