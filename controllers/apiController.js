@@ -77,10 +77,10 @@ exports.commentCreatePOST = [
 
     const post = await Post.findById(req.params.postId).exec();
 
-    if (post === null) {
+    if (post == null) {
       return res.status(404).json({
         fields: {},
-        errors: ['Post not found'],
+        message: 'Post not found',
       });
     }
 
@@ -113,12 +113,12 @@ exports.loginPOST = [
     const user = await User.findOne({ username: req.body.username });
     if (!user) {
       return res.status(404).json({
-        message: 'Not found',
+        message: 'User not found',
       });
     }
     if (user.password !== req.body.password) {
       return res.status(403).json({
-        message: 'Forbidden',
+        message: 'Password is incorrect',
       });
     }
 
@@ -150,14 +150,18 @@ exports.postCreatePOST = [
 
   asyncHandler(async (req, res) => {
     // Code to verify that user is admin
-    jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-      if (err) {
-        return res.status(403).json({
-          message: 'Forbidden',
-        });
-      }
-    });
-
+    try {
+      const token = getToken(req);
+      jwt.verify(token, process.env.SECRET_KEY, (err) => {
+        if (err) {
+          throw new Error('Authentication Failed');
+        }
+      });
+    } catch {
+      return res.status(403).json({
+        message: 'Admin not verified',
+      });
+    }
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -202,6 +206,20 @@ exports.postEditPUT = [
     .escape(),
 
   asyncHandler(async (req, res) => {
+    // Code to verify that user is admin
+    try {
+      const token = getToken(req);
+      jwt.verify(token, process.env.SECRET_KEY, (err) => {
+        if (err) {
+          throw new Error('Authentication Failed');
+        }
+      });
+    } catch {
+      return res.status(403).json({
+        message: 'Admin not verified',
+      });
+    }
+
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -215,24 +233,15 @@ exports.postEditPUT = [
       });
     }
 
-    // Code to verify that user is admin
-    jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-      if (err) {
-        return res.status(403).json({
-          message: 'Forbidden',
-        });
-      }
-    });
-
     const [post, commentList] = await Promise.all([
       Post.findById(req.params.postId).exec(),
       Comment.find({ parent: req.params.postId }).sort({ date: -1 }).exec(),
     ]);
 
-    if (post === null) {
+    if (post == null) {
       return res.status(404).json({
         fields: {},
-        errors: ['Post not found'],
+        message: 'Post not found',
       });
     }
 
@@ -253,22 +262,27 @@ exports.postEditPUT = [
 ];
 
 exports.postDELETE = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.postId).exec();
-
-  if (post === null) {
-    return res.status(404).json({
-      errors: ['Post not found'],
+  // Code to verify that user is admin
+  try {
+    const token = getToken(req);
+    jwt.verify(token, process.env.SECRET_KEY, (err) => {
+      if (err) {
+        throw new Error('Authentication Failed');
+      }
+    });
+  } catch {
+    return res.status(403).json({
+      message: 'Admin not verified',
     });
   }
 
-  // Code to verify that user is admin
-  jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-    if (err) {
-      return res.status(403).json({
-        message: 'Forbidden',
-      });
-    }
-  });
+  const post = await Post.findById(req.params.postId).exec();
+
+  if (post == null) {
+    return res.status(404).json({
+      message: 'Post not found',
+    });
+  }
 
   await Comment.deleteMany({ parent: req.params.postId });
   await Post.findByIdAndDelete(req.params.postId);
@@ -279,21 +293,27 @@ exports.postDELETE = asyncHandler(async (req, res) => {
 });
 
 exports.commentDELETE = asyncHandler(async (req, res) => {
-  const comment = await Comment.findById(req.params.commentId).exec();
-
-  if (comment === null) {
-    return res.status(404).json({
-      errors: ['Post not fouond'],
+  // Code to verify that user is admin
+  try {
+    const token = getToken(req);
+    jwt.verify(token, process.env.SECRET_KEY, (err) => {
+      if (err) {
+        throw new Error('Authentication Failed');
+      }
+    });
+  } catch {
+    return res.status(403).json({
+      message: 'Admin not verified',
     });
   }
 
-  jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-    if (err) {
-      return res.status(403).json({
-        message: 'Forbidden',
-      });
-    }
-  });
+  const comment = await Comment.findById(req.params.commentId).exec();
+
+  if (comment == null) {
+    return res.status(404).json({
+      message: 'Comment not found',
+    });
+  }
 
   await Comment.findByIdAndDelete(req.params.commentId);
 
