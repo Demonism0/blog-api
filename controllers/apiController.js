@@ -6,14 +6,26 @@ const User = require('../models/user');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 
+function getToken(req) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == null) {
+    throw new Error('No Token Provided');
+  }
+  return token;
+}
+
 exports.postsGET = asyncHandler(async (req, res) => {
   const postList = await Post.find().sort({ date: -1 }).exec();
   try {
-    jwt.verify(req.token, process.env.SECRET_KEY);
+    const token = getToken(req);
+    jwt.verify(token, process.env.SECRET_KEY, (err) => {
+      if (err) {
+        throw new Error('Authentication Failed');
+      }
+    });
   } catch {
-    const publicPosts = postList.filter(
-      (post) => post.public === true,
-    );
+    const publicPosts = postList.filter((post) => post.public === true);
     return res.json({
       message: 'Admin not verified, displaying public posts',
       postList: publicPosts,
