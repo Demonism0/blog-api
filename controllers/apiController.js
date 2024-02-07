@@ -178,6 +178,7 @@ exports.postCreatePOST = [
     const post = new Post({
       title: req.body.title,
       body: req.body.body,
+      date: new Date(),
       public: req.body.public,
     });
     await post.save();
@@ -248,7 +249,7 @@ exports.postEditPUT = [
     const updatedPost = new Post({
       title: req.body.title,
       body: req.body.body,
-      date: { ...post.date },
+      date: post.date,
       public: req.body.public,
       _id: req.params.postId,
     });
